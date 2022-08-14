@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class UserDaoImpl implements UserDao {
 
     private static final String SQL_CREATE_USER = "INSERT INTO USER_TABLE (NAME, EMAIL) VALUES (?,?)";
@@ -47,7 +49,7 @@ public class UserDaoImpl implements UserDao {
             email = Optional
                     .ofNullable(jdbcTemplate.queryForObject(SQL_CHECK_EMAIL_ALREADY_EXISTS, String.class, userDto.getEmail()));
         } catch (Exception e) {
-
+            log.info("identity check of email " + userDto.getEmail() + " has been passed!");
         }
 
         if (email.isEmpty()) {
@@ -61,6 +63,7 @@ public class UserDaoImpl implements UserDao {
 
             return getUser(keyHolder.getKey().longValue());
         } else {
+            log.warn("User with email: " + userDto.getEmail() + " already exists!");
             throw new InvalidDataConflictException("User with email: " + userDto.getEmail() + " already exists!");
         }
     }
@@ -87,6 +90,7 @@ public class UserDaoImpl implements UserDao {
             }
             return getUser(userId);
         } catch (Exception e) {
+            log.warn("User with email: " + userDto.getEmail() + " already exists!");
             throw new InvalidDataConflictException("User with email: " + userDto.getEmail() + " already exists!");
         }
     }

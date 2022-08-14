@@ -1,5 +1,8 @@
 package ru.practicum.shareit.item.dao;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -18,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class ItemDaoImpl implements ItemDao {
     private static final String SQL_ADD_ITEM = "INSERT INTO ITEM_TABLE (NAME, DESCRIPTION, IS_AVAILABLE, OWNER_ID) " +
             "VALUES(?,?,?,?)";
@@ -55,7 +59,7 @@ public class ItemDaoImpl implements ItemDao {
             userDto = Optional
                     .ofNullable(jdbcTemplate.queryForObject(SQL_GET_USER, new UserDtoRowMapper(), userId));
         } catch (Exception e) {
-
+            log.info("user with ID: " + userId + " exists");
         }
 
         if (userDto.isPresent()) {
@@ -70,6 +74,7 @@ public class ItemDaoImpl implements ItemDao {
             }, keyHolder);
             return getItem(keyHolder.getKey().longValue());
         } else {
+            log.warn("user with ID: " + userId + " has not been found!");
             throw new UserNotFoundException("User with ID:" + userId + "has not been found!");
         }
     }
@@ -96,6 +101,7 @@ public class ItemDaoImpl implements ItemDao {
             }
             return getItem(itemId);
         } else {
+            log.warn("user with ID: " + userId + " is not an owner of item with ID " + itemId);
             throw new UserNotFoundException("You are not an owner of this item");
         }
     }

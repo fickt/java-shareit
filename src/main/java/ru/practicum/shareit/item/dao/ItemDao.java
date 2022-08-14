@@ -11,7 +11,7 @@ public interface ItemDao {
 
     ItemDto editItem(Long userId, Long itemId, ItemDto itemDto);
 
-    List<ItemDto> getListOfItems (Long userId);
+    List<ItemDto> getListOfItems(Long userId);
 
     List<ItemDto> getListOfItemsBySearch(String text);
 }

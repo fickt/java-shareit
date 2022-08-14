@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class ItemDtoRowMapper implements RowMapper<ItemDto>{
+public class ItemDtoRowMapper implements RowMapper<ItemDto> {
 
     @Override
     public ItemDto mapRow(ResultSet rs, int rowNum) throws SQLException {

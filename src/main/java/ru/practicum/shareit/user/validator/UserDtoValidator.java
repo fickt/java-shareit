@@ -5,7 +5,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 public class UserDtoValidator {
 
     public static boolean isValid(UserDto userDto) {
-        if(userDto.getName() == null
+        if (userDto.getName() == null
                 || userDto.getName().isBlank()
                 || userDto.getEmail() == null
                 || userDto.getEmail().isBlank()

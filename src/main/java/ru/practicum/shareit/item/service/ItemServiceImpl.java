@@ -19,7 +19,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
-        if(isValid(itemDto)) {
+        if (isValid(itemDto)) {
             return itemDao.addItem(userId, itemDto);
         } else {
             throw new ValidationException("invalid request body ItemDto");
@@ -37,7 +37,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListOfItems (long userId) {
+    public List<ItemDto> getListOfItems(long userId) {
         return itemDao.getListOfItems(userId);
     }
 
