@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.shareit.booking.status.Status;
 
 
 @Data
@@ -15,5 +16,5 @@ public class Booking {
     private String end;
     private Long itemId;
     private Long userId;
-    private String status;
+    private Status status;
 }

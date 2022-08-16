@@ -21,4 +21,5 @@ public class ItemDto {
     @NotNull(message = "please set availability")
     @JsonProperty("available")
     private Boolean isAvailable;
+    private Long request;
 }
