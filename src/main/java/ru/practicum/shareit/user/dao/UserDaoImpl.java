@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.InvalidDataConflictException;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.rowmapper.UserDtoRowMapper;
 
@@ -14,7 +15,6 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -32,7 +32,7 @@ public class UserDaoImpl implements UserDao {
 
     private static final String SQL_GET_ALL_USERS = "SELECT * FROM USER_TABLE";
 
-    private static final String SQL_CHECK_EMAIL_ALREADY_EXISTS = "SELECT EMAIL FROM USER_TABLE WHERE EMAIL=?";
+    private static final String SQL_CHECK_EMAIL_IF_EXISTS = "SELECT COUNT(EMAIL) FROM USER_TABLE WHERE EMAIL=?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -42,29 +42,22 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(User user) {
 
-        Optional<String> email = Optional.empty();
-        try {
-            email = Optional
-                    .ofNullable(jdbcTemplate.queryForObject(SQL_CHECK_EMAIL_ALREADY_EXISTS, String.class, userDto.getEmail()));
-        } catch (Exception e) {
-            log.info("identity check of email " + userDto.getEmail() + " has been passed!");
-        }
+        Long isEmailPresent = jdbcTemplate.queryForObject(SQL_CHECK_EMAIL_IF_EXISTS, Long.class, user.getEmail());
 
-        if (email.isEmpty()) {
+        if (isEmailPresent == 0) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(SQL_CREATE_USER, new String[]{"ID"});
-                stmt.setString(1, userDto.getName());
-                stmt.setString(2, userDto.getEmail());
+                stmt.setString(1, user.getName());
+                stmt.setString(2, user.getEmail());
                 return stmt;
             }, keyHolder);
-
             return getUser(keyHolder.getKey().longValue());
         } else {
-            log.warn("User with email: " + userDto.getEmail() + " already exists!");
-            throw new InvalidDataConflictException("User with email: " + userDto.getEmail() + " already exists!");
+            log.warn("User with email: " + user.getEmail() + " already exists!");
+            throw new InvalidDataConflictException("User with email: " + user.getEmail() + " already exists!");
         }
     }
 

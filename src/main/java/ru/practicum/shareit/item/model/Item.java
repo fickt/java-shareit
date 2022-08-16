@@ -1,12 +1,24 @@
 package ru.practicum.shareit.item.model;
 
-/**
- * // TODO .
- */
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
 public class Item {
-    private long id;
-    private long ownerId;
+    private Long id;
+    private Long ownerId;
+    @NotNull(message = "name should not be empty")
+    @NotBlank(message = "name should not be empty")
     private String name;
+    @NotNull(message = "description should not be empty")
+    @NotBlank(message = "description should not be empty")
     private String description;
-    private boolean isAvailable;
+    @NotNull(message = "please set availability")
+    @JsonProperty("available")
+    private Boolean isAvailable;
 }

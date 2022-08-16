@@ -8,15 +8,14 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.rowmapper.UserDtoRowMapper;
 
+import javax.validation.Valid;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -39,9 +38,9 @@ public class ItemDaoImpl implements ItemDao {
 
     private static final String SQL_GET_OWNER_OF_ITEM = "SELECT OWNER_ID FROM ITEM_TABLE WHERE ID=?";
 
-    private static final String SQL_GET_USER = "SELECT * FROM USER_TABLE WHERE ID=?";
+    private static final String SQL_CHECK_USER_IF_EXISTS = "SELECT COUNT(NAME) FROM USER_TABLE WHERE ID=?";
 
-    JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public ItemDaoImpl(JdbcTemplate jdbcTemplate) {
@@ -49,24 +48,16 @@ public class ItemDaoImpl implements ItemDao {
     }
 
     @Override
-    public ItemDto addItem(Long userId, ItemDto itemDto) {
+    public ItemDto addItem(Long userId, @Valid Item item) {
+        Long isUserPresent = jdbcTemplate.queryForObject(SQL_CHECK_USER_IF_EXISTS, Long.class, userId);
 
-        Optional<UserDto> userDto = Optional.empty();
-
-        try {
-            userDto = Optional
-                    .ofNullable(jdbcTemplate.queryForObject(SQL_GET_USER, new UserDtoRowMapper(), userId));
-        } catch (Exception e) {
-            log.info("user with ID: " + userId + " exists");
-        }
-
-        if (userDto.isPresent()) {
+        if (isUserPresent > 0) {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(SQL_ADD_ITEM, new String[]{"ID"});
-                stmt.setString(1, itemDto.getName());
-                stmt.setString(2, itemDto.getDescription());
-                stmt.setBoolean(3, itemDto.getIsAvailable());
+                stmt.setString(1, item.getName());
+                stmt.setString(2, item.getDescription());
+                stmt.setBoolean(3, item.getIsAvailable());
                 stmt.setLong(4, userId);
                 return stmt;
             }, keyHolder);

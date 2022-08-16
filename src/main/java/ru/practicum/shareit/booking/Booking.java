@@ -1,17 +1,19 @@
 package ru.practicum.shareit.booking;
 
+import lombok.Builder;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * // TODO .
- */
+
+@Data
+@Builder
 public class Booking {
-    private long id;
+    private Long id;
     @DateTimeFormat(pattern = "uuuu-MM-dd")
     private String start;
     @DateTimeFormat(pattern = "uuuu-MM-dd")
     private String end;
-    private long itemId;
-    private long userId;
+    private Long itemId;
+    private Long userId;
     private String status;
 }

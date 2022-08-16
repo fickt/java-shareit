@@ -1,11 +1,12 @@
 package ru.practicum.shareit.item.dao;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
 public interface ItemDao {
-    ItemDto addItem(Long userId, ItemDto itemDto);
+    ItemDto addItem(Long userId, Item item);
 
     ItemDto getItem(Long itemId);
 

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -14,7 +15,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    UserService userServiceImpl;
+    private final UserService userServiceImpl;
 
     @Autowired
     public UserController(UserService userServiceImpl) {
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody UserDto userDto) {
+    public UserDto createUser(@RequestBody @Valid UserDto userDto) {
         return userServiceImpl.createUser(userDto);
     }
 

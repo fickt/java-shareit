@@ -2,13 +2,13 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.rowmapper.UserDtoRowMapper;
 
+import javax.validation.Valid;
 import java.util.List;
 
-import static ru.practicum.shareit.user.validator.UserDtoValidator.isValid;
 
 @Service
 @RequiredArgsConstructor
@@ -17,12 +17,8 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Override
-    public UserDto createUser(UserDto user) {
-        if (isValid(user)) {
-            return userDao.createUser(user);
-        } else {
-            throw new ValidationException("Invalid request body UserDto");
-        }
+    public UserDto createUser(@Valid UserDto userDto) {
+            return userDao.createUser(UserDtoRowMapper.convertDtoToUser(userDto));
     }
 
     @Override

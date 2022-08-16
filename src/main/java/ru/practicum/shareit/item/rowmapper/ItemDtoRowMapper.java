@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.rowmapper;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,16 +22,37 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
         return itemDto;
     }
 
-
     public static ItemDto mapRow(Map<String, Object> map) {
-        ItemDto itemDto = ItemDto.builder()
+        return ItemDto
+                .builder()
                 .id((Long) map.get("ID"))
                 .name((String) map.get("NAME"))
                 .description((String) map.get("DESCRIPTION"))
                 .isAvailable((Boolean) map.get("IS_AVAILABLE"))
                 .ownerId((Long) map.get("OWNER_ID"))
                 .build();
-        return itemDto;
+    }
+
+    public static ItemDto convertItemToDto(Item item) {
+        return ItemDto
+                .builder()
+                .id(item.getId())
+                .name(item.getName())
+                .ownerId(item.getOwnerId())
+                .description(item.getDescription())
+                .isAvailable(item.getIsAvailable())
+                .build();
+    }
+
+    public static Item convertDtoToItem(ItemDto item) {
+        return Item
+                .builder()
+                .id(item.getId())
+                .name(item.getName())
+                .ownerId(item.getOwnerId())
+                .description(item.getDescription())
+                .isAvailable(item.getIsAvailable())
+                .build();
     }
 
 }

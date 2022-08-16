@@ -2,14 +2,12 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
-
+import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
 
 import java.util.List;
 
-import static ru.practicum.shareit.item.validator.ItemDtoValidator.isValid;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +17,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(long userId, ItemDto itemDto) {
-        if (isValid(itemDto)) {
-            return itemDao.addItem(userId, itemDto);
-        } else {
-            throw new ValidationException("invalid request body ItemDto");
-        }
+        return itemDao.addItem(userId, ItemDtoRowMapper.convertDtoToItem(itemDto));
     }
 
     @Override

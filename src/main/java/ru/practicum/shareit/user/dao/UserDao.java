@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.dao;
 
 import org.hibernate.JDBCException;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public interface UserDao {
 
-    UserDto createUser(UserDto userDto) throws JDBCException;
+    UserDto createUser(User userDto) throws JDBCException;
 
     UserDto getUser(Long userId);
 

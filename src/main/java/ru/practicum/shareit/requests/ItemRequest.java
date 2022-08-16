@@ -1,11 +1,13 @@
 package ru.practicum.shareit.requests;
 
-/**
- * // TODO .
- */
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
 public class ItemRequest {
-    private long itemRequestId;
+    private Long id;
     private String description;
-    private long requestorId;
+    private Long requestorId;
     private String created;
 }
