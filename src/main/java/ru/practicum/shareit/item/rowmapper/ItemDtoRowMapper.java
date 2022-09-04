@@ -6,6 +6,8 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ItemDtoRowMapper implements RowMapper<ItemDto> {
@@ -55,4 +57,11 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .build();
     }
 
+    public static List<ItemDto> convertListOfItemsToListOfDtoItems(List<Item> itemList) {
+        List<ItemDto> itemDtoList = new ArrayList<>();
+        for(Item item : itemList) {
+            itemDtoList.add(convertItemToDto(item));
+        }
+        return itemDtoList;
+    }
 }

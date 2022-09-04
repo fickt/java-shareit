@@ -6,7 +6,7 @@ public enum Status {
     REJECTED("rejected"),
     CANCELLED("cancelled");
 
-    private String name;
+    private final String name;
 
     Status(String name) {
         this.name = name;
@@ -15,5 +15,4 @@ public enum Status {
     public String getName() {
         return name;
     }
-
 }

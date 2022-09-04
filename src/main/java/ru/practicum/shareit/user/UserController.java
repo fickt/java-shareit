@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
@@ -8,9 +9,6 @@ import ru.practicum.shareit.user.service.UserService;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * // TODO .
- */
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -18,7 +16,7 @@ public class UserController {
     private final UserService userServiceImpl;
 
     @Autowired
-    public UserController(UserService userServiceImpl) {
+    public UserController(@Qualifier("UserServiceRepos") UserService userServiceImpl) {
         this.userServiceImpl = userServiceImpl;
     }
 

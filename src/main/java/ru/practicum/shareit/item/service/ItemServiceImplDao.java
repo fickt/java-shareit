@@ -9,9 +9,9 @@ import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
 import java.util.List;
 
 
-@Service
+@Service("ItemServiceDao")
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImplDao implements ItemService {
 
     private final ItemDao itemDao;
 

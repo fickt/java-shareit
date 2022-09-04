@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
@@ -64,7 +64,7 @@ public class ItemDaoImpl implements ItemDao {
             return getItem(keyHolder.getKey().longValue());
         } else {
             log.warn("user with ID: " + userId + " has not been found!");
-            throw new UserNotFoundException("User with ID:" + userId + "has not been found!");
+            throw new NotFoundException("User with ID:" + userId + "has not been found!");
         }
     }
 
@@ -91,7 +91,7 @@ public class ItemDaoImpl implements ItemDao {
             return getItem(itemId);
         } else {
             log.warn("user with ID: " + userId + " is not an owner of item with ID " + itemId);
-            throw new UserNotFoundException("You are not an owner of this item");
+            throw new NotFoundException("You are not an owner of this item");
         }
     }
 

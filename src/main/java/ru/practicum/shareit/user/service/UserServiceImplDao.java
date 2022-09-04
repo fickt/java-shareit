@@ -10,9 +10,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 
-@Service
+@Service("UserServiceDao")
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImplDao implements UserService {
 
     private final UserDao userDao;
 
