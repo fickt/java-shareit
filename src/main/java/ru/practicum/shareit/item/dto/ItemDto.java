@@ -3,35 +3,18 @@ package ru.practicum.shareit.item.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.comment.model.Comment;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder
 public class ItemDto {
 
-    public ItemDto() {
-
-    }
-
-    public ItemDto(Long id, Long ownerId, String name, String description, Boolean isAvailable, Long requestId) {
-        this.id = id;
-        this.ownerId = ownerId;
-        this.name = name;
-        this.description = description;
-        this.isAvailable = isAvailable;
-        this.requestId = requestId;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "OWNER_ID")
     private Long ownerId;
     @NotBlank(message = "name should not be empty")
     private String name;
@@ -39,8 +22,9 @@ public class ItemDto {
     private String description;
     @NotNull(message = "please set availability")
     @JsonProperty("available")
-    @Column(name = "IS_AVAILABLE")
     private Boolean isAvailable;
-    // @Column(name="REQUEST_ID")
+    private List<Comment> comments;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
     private Long requestId;
 }

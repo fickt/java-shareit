@@ -6,9 +6,9 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UserDtoRowMapper implements RowMapper<UserDto> {
 
@@ -48,10 +48,8 @@ public class UserDtoRowMapper implements RowMapper<UserDto> {
     }
 
     public static List<UserDto> convertListOfUsersToListOfDtoUsers(List<User> userList) {
-        List<UserDto> userDtoList = new ArrayList<>();
-        for(User user : userList) {
-            userDtoList.add(convertUserToDto(user));
-        }
-        return userDtoList;
+        return userList.stream()
+                .map(UserDtoRowMapper::convertUserToDto)
+                .collect(Collectors.toList());
     }
 }

@@ -1,15 +1,11 @@
 package ru.practicum.shareit.user.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.model.Booking;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
@@ -21,11 +17,10 @@ public class User {
 
     }
 
-    public User(Long id, String name, String email, List<Booking> bookings ) {
+    public User(Long id, String name, String email) {
         this.id = id;
         this.name = name;
         this.email = email;
-        this.bookings = bookings;
     }
 
     @Id
@@ -37,7 +32,4 @@ public class User {
     @Email(message = "invalid email")
     @Column(name = "EMAIL", unique = true)
     private String email;
-    @JsonIgnore
-    @OneToMany(mappedBy = "booker")
-    List<Booking> bookings = new ArrayList<>();
 }

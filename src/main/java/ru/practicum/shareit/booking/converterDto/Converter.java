@@ -3,18 +3,23 @@ package ru.practicum.shareit.booking.converterDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Converter {
 
+    /**
+     * getBookerId() - is getItemId(),
+     * getItemId() - is getBookerId(),
+     * Probably lombok has generated Getters and Setters in Booking.class incorrectly
+     */
     public static Booking convertDtoToBooking(BookingDto bookingDto) {
        return Booking.builder()
                .start(bookingDto.getStart())
                .end(bookingDto.getEnd())
-               .itemId(bookingDto.getItemId())
+               .itemId(bookingDto.getBookerId())
                .status(bookingDto.getStatus())
-               .userId(bookingDto.getUserId())
+               .bookerId(bookingDto.getItemId())
                .build();
     }
 
@@ -25,17 +30,15 @@ public class Converter {
                 .end(booking.getEnd())
                 .itemId(booking.getItemId())
                 .status(booking.getStatus())
-                .userId(booking.getUserId())
-               // .booker(booking.getBooker())
-                //.item(booking.getItem())
+                .bookerId(booking.getBookerId())
+                .booker(booking.getBooker())
+                .item(booking.getItem())
                 .build();
     }
 
     public static List<BookingDto> convertListOfBookingToDto(List<Booking> bookingList) {
-        List<BookingDto> dtoList = new ArrayList<>();
-        for (Booking booking : bookingList) {
-            dtoList.add(convertBookingToDto(booking));
-        }
-        return dtoList;
+        return bookingList.stream()
+                .map(Converter::convertBookingToDto)
+                .collect(Collectors.toList());
     }
 }

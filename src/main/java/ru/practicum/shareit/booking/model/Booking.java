@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @Table(name = "BOOKING_TABLE")
 public class Booking {
 
-    public Booking(Long id, LocalDateTime start, LocalDateTime end, User booker, Item item, Long itemId, Long userId, Status status) {
+    public Booking(Long id, LocalDateTime start, LocalDateTime end,Long bookerId, Long itemId, User booker, Item item, Status status) {
         this.id = id;
         this.start = start;
         this.end = end;
         this.itemId = itemId;
-        this.userId = userId;
+        this.bookerId = bookerId;
         this.status = status;
         this.booker = booker;
         this.item = item;
@@ -43,18 +43,12 @@ public class Booking {
     @Column(name = "ITEM_ID")
     private Long itemId;
     @Column(name = "USER_ID")
-    private Long userId;
-    @ManyToOne
-    @JoinTable(name = "BOOKING_USER_TABLE",
-            joinColumns = {@JoinColumn(name = "BOOKING_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "USER_ID")}
-    )
+    private Long bookerId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name="USER_ID", insertable = false, updatable = false)
     private User booker;
-    @OneToOne
-    @JoinTable(name = "ITEM_BOOKING_TABLE",
-            joinColumns = {@JoinColumn(name = "BOOKING_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "ITEM_ID")}
-    )
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name="ITEM_ID", insertable = false, updatable = false)
     private Item item;
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)

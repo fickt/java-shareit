@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.converterDto.Converter;
@@ -15,13 +16,13 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDate;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@Slf4j
 public class BookingServiceImplRepos implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -31,7 +32,7 @@ public class BookingServiceImplRepos implements BookingService {
     private final UserRepository userRepository;
 
     @Autowired
-    public BookingServiceImplRepos (BookingRepository bookingRepository, ItemRepository itemRepository, UserRepository userRepository) {
+    public BookingServiceImplRepos(BookingRepository bookingRepository, ItemRepository itemRepository, UserRepository userRepository) {
         this.itemRepository = itemRepository;
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
@@ -39,119 +40,150 @@ public class BookingServiceImplRepos implements BookingService {
 
     @Override
     public BookingDto createBooking(BookingDto bookingDto, Long userId) {
-        Optional<Item> itemOpt = itemRepository.findById(bookingDto.getItemId());
+        Item item = itemRepository
+                .findById(bookingDto.getItemId())
+                .orElseThrow(() -> new NotFoundException(String.format("item with ID: %s has not been found!", bookingDto.getItemId())));
 
-        if (itemOpt.isEmpty()) {
-            throw new NotFoundException(String.format("item with ID: %s has not been found!", bookingDto.getItemId()));
-        }
-
-        if (!itemOpt.get().getIsAvailable()) {
+        if (!item.getIsAvailable()) {
+            log.warn(MessageFormat.format("Item with ID: {0} is unavailable for booking", bookingDto.getItemId()));
             throw new ValidationException(String.format("Item with ID: %s is unavailable for booking", bookingDto.getItemId()));
         }
 
-        Optional<User> userOpt = userRepository.findById(userId);
-
-        if (userOpt.isEmpty()) {
-            throw new NotFoundException((String.format("User with ID: %s has not been found!", userId)));
-        }
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", userId))));
 
         if (bookingDto.getStart().isAfter(bookingDto.getEnd()) || bookingDto.getStart().isBefore(LocalDateTime.now())) {
+            log.warn(MessageFormat.format("Invalid period of time, booking: {0}", bookingDto));
             throw new ValidationException("Invalid period of time");
         }
 
-        bookingDto.setUserId(userId);
+        if (item.getOwnerId().equals(userId)) {
+            log.warn(MessageFormat.format("You are owner of this item! User ID: {0}", userId));
+            throw new NotFoundException("You are owner of this item!");
+        }
+
+        bookingDto.setBookerId(userId);
         bookingDto.setStatus(Status.WAITING);
         Booking booking = bookingRepository.save(Converter.convertDtoToBooking(bookingDto));
+        log.info(MessageFormat.format("Booking has been saved to Database: {0}", booking));
         return Converter.convertBookingToDto(booking);
     }
 
     @Override
-    public BookingDto getBooking(Long bookingId) {
-        return Converter.convertBookingToDto(bookingRepository.findById(bookingId).get());
+    public BookingDto getBooking(Long userId, Long bookingId) {
+        BookingDto bookingDto = Converter.convertBookingToDto(bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID: %s has not been found!", bookingId))));
+        if (!bookingDto.getBooker().getId().equals(userId)) {
+            if (!bookingDto.getItem().getOwnerId().equals(userId)) {
+                throw new NotFoundException(MessageFormat.format("You are not a booker of booking with ID: {0} or " +
+                        "not an owner of item with ID: {1}", bookingId, bookingDto.getItem().getId()));
+            }
+        }
+        return bookingDto;
     }
 
     @Override
     public BookingDto changeStatusBooking(Long ownerId, Long bookingId, Boolean isApproved) {
-        Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
-        if (bookingOpt.isEmpty()) {
-            throw new NotFoundException(String.format("Booking with ID: %s has not been found!", bookingId));
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID: %s has not been found!", bookingId)));
+
+        if (booking.getStatus().equals(Status.APPROVED)) {
+            log.warn(MessageFormat.format("Booking with ID: {0} is already approved!", bookingId));
+            throw new ValidationException(String.format("Booking with ID: %s is already approved!", bookingId));
         }
 
-        Booking booking = bookingOpt.get();
+        if (booking.getBooker().getId().equals(ownerId)) {
+            throw new NotFoundException("Booker can not change status of Booking, only owner of item!");
+        }
 
-        if (ownerId.equals(bookingRepository.findOwnerOfItem(booking.getItemId()))) {
+        if (ownerId.equals(bookingRepository.findOwnerOfItem(booking.getItem().getId()))) {
             if (isApproved) {
+                log.info(MessageFormat.format("Booking {0} with status {1}, is updated to status {2}",
+                        booking, booking.getStatus(), Status.APPROVED));
                 booking.setStatus(Status.APPROVED);
             } else {
+                log.info(MessageFormat.format("Booking {0} with status {1}, is updated to status {2}",
+                        booking, booking.getStatus(), Status.REJECTED));
                 booking.setStatus(Status.REJECTED);
             }
         } else {
+            log.warn(MessageFormat.format("User with ID: {0} is not an owner of item with ID: {1}",
+                    ownerId, booking.getItem().getId()));
             throw new NotOwnerException("You are not an owner of this item !");
         }
-        return Converter.convertBookingToDto(booking);
+        BookingDto bookingUpdatedDto = Converter.convertBookingToDto(bookingRepository.save(booking));
+        log.info(MessageFormat.format("Booking has been saved to Database: {0}", bookingUpdatedDto));
+        return bookingUpdatedDto;
     }
 
     @Override
     public List<BookingDto> getAllBookingsOfUser(Long userId, String state) {
-        LocalDate date = LocalDate.now();
-        String format = "uuuu-MM-dd HH:mm:ss";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
-        if (state == null) {
-            return Converter.convertListOfBookingToDto(bookingRepository.findAllByUserId(userId));
-        } else if (state.equals("current")) {
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", userId))));
+
+        LocalDateTime date = LocalDateTime.now();
+        if (state == null || state.equalsIgnoreCase("all")) {
+            return Converter
+                    .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
+        } else if (state.equalsIgnoreCase("current")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndDateBetweenStartAndEnd(userId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("past")) {
+                            .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date));
+        } else if (state.equalsIgnoreCase("past")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndDateAfterEnd(userId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("future")) {
+                            .findAllByBookerIdAndDateAfterEnd(userId, date));
+        } else if (state.equalsIgnoreCase("future")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndDateBeforeStart(userId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("waiting")) {
+                            .findAllByBookerIdAndDateBeforeStart(userId, date));
+        } else if (state.equalsIgnoreCase("waiting")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndStatusEqualsOrderByStart(userId, Status.WAITING));
-        } else if (state.equals("rejected")) {
+                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING));
+        } else if (state.equalsIgnoreCase("rejected")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndStatusEqualsOrderByStart(userId, Status.REJECTED));
+                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED));
         } else {
-            throw new NotFoundException("Unknown request");
+            throw new ValidationException(String.format("Unknown state: %s", state));
         }
     }
 
     @Override
     public List<BookingDto> getAllBookingsOfItemsOfOwner(Long ownerId, String state) {
-        LocalDate date = LocalDate.now();
-        String format = "uuuu-MM-dd HH:mm:ss";
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
-        if (state == null) {
+        userRepository
+                .findById(ownerId)
+                .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", ownerId))));
+
+        LocalDateTime date = LocalDateTime.now();
+        if (state == null || state.equalsIgnoreCase("all")) {
             return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId));
-        } else if (state.equals("current")) {
+        } else if (state.equalsIgnoreCase("current")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("past")) {
+                            .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date));
+        } else if (state.equalsIgnoreCase("past")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateAfterEnd(ownerId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("future")) {
+                            .findAllByOwnerIdAndDateAfterStart(ownerId, date));
+        } else if (state.equalsIgnoreCase("future")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBeforeStart(ownerId, LocalDate.parse(date.format(dateTimeFormatter))));
-        } else if (state.equals("waiting")) {
+                            .findAllByOwnerIdAndDateBeforeStart(ownerId, date));
+        } else if (state.equalsIgnoreCase("waiting")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING));
-        } else if (state.equals("rejected")) {
+                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName()));
+        } else if (state.equalsIgnoreCase("rejected")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByUserIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED));
+                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName()));
         } else {
-            throw new NotFoundException("Unknown request");
+            throw new ValidationException(String.format("Unknown state: %s", state));
         }
     }
 }

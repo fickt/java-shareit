@@ -20,7 +20,7 @@ public class BookingDto {
     @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
     private LocalDateTime end;
     transient private Long itemId;
-    transient private Long userId;
+    transient private Long bookerId;
     private Item item;
     private User booker;
     private Status status;

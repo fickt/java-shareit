@@ -6,9 +6,9 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ItemDtoRowMapper implements RowMapper<ItemDto> {
 
@@ -43,6 +43,7 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .ownerId(item.getOwnerId())
                 .description(item.getDescription())
                 .isAvailable(item.getIsAvailable())
+                .comments(item.getComments())
                 .build();
     }
 
@@ -58,10 +59,8 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
     }
 
     public static List<ItemDto> convertListOfItemsToListOfDtoItems(List<Item> itemList) {
-        List<ItemDto> itemDtoList = new ArrayList<>();
-        for(Item item : itemList) {
-            itemDtoList.add(convertItemToDto(item));
-        }
-        return itemDtoList;
+        return itemList.stream()
+                .map(ItemDtoRowMapper::convertItemToDto)
+                .collect(Collectors.toList());
     }
 }
