@@ -93,7 +93,7 @@ public class ItemServiceImplRepos implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID: %s has not been found!", itemId)));
 
-        if (item.getOwnerId() != userId) {
+        if (!item.getOwnerId().equals(userId)) {
             throw new NotOwnerException("You are not an owner of this item!");
         }
 
