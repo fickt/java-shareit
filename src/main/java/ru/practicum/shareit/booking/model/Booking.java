@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "BOOKING_TABLE")
 public class Booking {
 
-    public Booking(Long id, LocalDateTime start, LocalDateTime end,Long bookerId, Long itemId, User booker, Item item, Status status) {
+    public Booking(Long id, LocalDateTime start, LocalDateTime end, Long bookerId, Long itemId, User booker, Item item, Status status) {
         this.id = id;
         this.start = start;
         this.end = end;
@@ -45,10 +45,10 @@ public class Booking {
     @Column(name = "USER_ID")
     private Long bookerId;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name="USER_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
     private User booker;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name="ITEM_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)
     private Item item;
     @Column(name = "STATUS")
     @Enumerated(EnumType.STRING)

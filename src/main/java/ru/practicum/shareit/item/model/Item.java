@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "ITEM_TABLE")
 public class Item {
 
-    public Item () {
+    public Item() {
 
     }
 

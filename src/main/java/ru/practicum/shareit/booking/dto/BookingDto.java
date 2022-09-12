@@ -19,8 +19,8 @@ public class BookingDto {
     private LocalDateTime start;
     @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
     private LocalDateTime end;
-    transient private Long itemId;
-    transient private Long bookerId;
+    private transient Long itemId;
+    private transient Long bookerId;
     private Item item;
     private User booker;
     private Status status;

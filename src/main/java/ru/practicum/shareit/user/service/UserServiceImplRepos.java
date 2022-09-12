@@ -36,7 +36,7 @@ public class UserServiceImplRepos implements UserService {
     @Override
     public UserDto getUser(Long userId) {
         Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             return UserDtoRowMapper.convertUserToDto(user.get());
         } else {
             throw new NotFoundException(String.format("User with ID: %s has not been found!", userId));
@@ -73,6 +73,6 @@ public class UserServiceImplRepos implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-       return UserDtoRowMapper.convertListOfUsersToListOfDtoUsers(userRepository.findAll());
+        return UserDtoRowMapper.convertListOfUsersToListOfDtoUsers(userRepository.findAll());
     }
 }

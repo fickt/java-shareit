@@ -18,7 +18,7 @@ public class Comment {
 
     }
 
-    public Comment(Long id, String text, Long itemId, Long authorId, String authorName, LocalDateTime created , Item item) {
+    public Comment(Long id, String text, Long itemId, Long authorId, String authorName, LocalDateTime created, Item item) {
         this.id = id;
         this.text = text;
         this.itemId = itemId;
