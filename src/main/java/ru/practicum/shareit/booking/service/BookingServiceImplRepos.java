@@ -72,11 +72,9 @@ public class BookingServiceImplRepos implements BookingService {
     public BookingDto getBooking(Long userId, Long bookingId) {
         BookingDto bookingDto = Converter.convertBookingToDto(bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Booking with ID: %s has not been found!", bookingId))));
-        if (!bookingDto.getBooker().getId().equals(userId)) {
-            if (!bookingDto.getItem().getOwnerId().equals(userId)) {
+        if (!bookingDto.getBooker().getId().equals(userId) && !bookingDto.getItem().getOwnerId().equals(userId)) {
                 throw new NotFoundException(MessageFormat.format("You are not a booker of booking with ID: {0} or " +
                         "not an owner of item with ID: {1}", bookingId, bookingDto.getItem().getId()));
-            }
         }
         return bookingDto;
     }
@@ -97,7 +95,7 @@ public class BookingServiceImplRepos implements BookingService {
         }
 
         if (ownerId.equals(bookingRepository.findOwnerOfItem(booking.getItem().getId()))) {
-            if (isApproved) {
+            if (Boolean.TRUE.equals(isApproved)) {
                 log.info(MessageFormat.format("Booking {0} with status {1}, is updated to status {2}",
                         booking, booking.getStatus(), Status.APPROVED));
                 booking.setStatus(Status.APPROVED);
