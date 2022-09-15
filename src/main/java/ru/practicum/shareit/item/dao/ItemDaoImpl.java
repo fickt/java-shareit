@@ -6,16 +6,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
 
 import javax.validation.Valid;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -49,24 +47,25 @@ public class ItemDaoImpl implements ItemDao {
 
     @Override
     public ItemDto addItem(Long userId, @Valid Item item) {
-        Long isUserPresent = jdbcTemplate.queryForObject(SQL_CHECK_USER_IF_EXISTS, Long.class, userId);
+        Optional.ofNullable(jdbcTemplate.queryForObject(SQL_CHECK_USER_IF_EXISTS, Long.class, userId))
+                .orElseThrow(() -> new NotFoundException("User with ID:" + userId + "has not been found!"));
 
-        if (isUserPresent > 0) {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement stmt = connection.prepareStatement(SQL_ADD_ITEM, new String[]{"ID"});
-                stmt.setString(1, item.getName());
-                stmt.setString(2, item.getDescription());
-                stmt.setBoolean(3, item.getIsAvailable());
-                stmt.setLong(4, userId);
-                return stmt;
-            }, keyHolder);
-            return getItem(keyHolder.getKey().longValue());
-        } else {
-            log.warn("user with ID: " + userId + " has not been found!");
-            throw new UserNotFoundException("User with ID:" + userId + "has not been found!");
-        }
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(SQL_ADD_ITEM, new String[]{"ID"});
+            stmt.setString(1, item.getName());
+            stmt.setString(2, item.getDescription());
+            stmt.setBoolean(3, item.getIsAvailable());
+            stmt.setLong(4, userId);
+            return stmt;
+        }, keyHolder);
+
+        Number itemIdNumber = Optional.ofNullable(keyHolder.getKey())
+                .orElseThrow(() -> new NotFoundException(String.format("A problem occurred saving item: %s in DB", item.getName())));
+
+        return getItem(itemIdNumber.longValue());
     }
+
 
     @Override
     public ItemDto getItem(Long itemId) {
@@ -91,7 +90,7 @@ public class ItemDaoImpl implements ItemDao {
             return getItem(itemId);
         } else {
             log.warn("user with ID: " + userId + " is not an owner of item with ID " + itemId);
-            throw new UserNotFoundException("You are not an owner of this item");
+            throw new NotFoundException("You are not an owner of this item");
         }
     }
 

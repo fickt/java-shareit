@@ -1,12 +1,14 @@
 package ru.practicum.shareit.user.rowmapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UserDtoRowMapper implements RowMapper<UserDto> {
 
@@ -43,5 +45,11 @@ public class UserDtoRowMapper implements RowMapper<UserDto> {
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
+    }
+
+    public static List<UserDto> convertListOfUsersToListOfDtoUsers(List<User> userList) {
+        return userList.stream()
+                .map(UserDtoRowMapper::convertUserToDto)
+                .collect(Collectors.toList());
     }
 }
