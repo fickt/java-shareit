@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.converterDto.Converter;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -115,69 +118,69 @@ public class BookingServiceImplRepos implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsOfUser(Long userId, String state) {
+    public List<BookingDto> getAllBookingsOfUser(Long userId, String state, Long from, Long size) {
         userRepository
                 .findById(userId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", userId))));
-
+        Pageable pageable = PageRequest.of(from.intValue(), size.intValue(), Sort.by("start").descending());
         LocalDateTime date = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("all")) {
             return Converter
-                    .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
+                    .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId, pageable));
         } else if (state.equalsIgnoreCase("current")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date));
+                            .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date, pageable));
         } else if (state.equalsIgnoreCase("past")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateAfterEnd(userId, date));
+                            .findAllByBookerIdAndDateAfterEnd(userId, date, pageable));
         } else if (state.equalsIgnoreCase("future")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateBeforeStart(userId, date));
+                            .findAllByBookerIdAndDateBeforeStart(userId, date, pageable));
         } else if (state.equalsIgnoreCase("waiting")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING));
+                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING, pageable));
         } else if (state.equalsIgnoreCase("rejected")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED));
+                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED, pageable));
         } else {
             throw new ValidationException(String.format("Unknown state: %s", state));
         }
     }
 
     @Override
-    public List<BookingDto> getAllBookingsOfItemsOfOwner(Long ownerId, String state) {
+    public List<BookingDto> getAllBookingsOfItemsOfOwner(Long ownerId, String state, Long from, Long size) {
         userRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", ownerId))));
-
+        Pageable pageable = PageRequest.of(from.intValue(), size.intValue(), Sort.by("start").descending());
         LocalDateTime date = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("all")) {
-            return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId));
+            return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId, pageable));
         } else if (state.equalsIgnoreCase("current")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date));
+                            .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date, pageable));
         } else if (state.equalsIgnoreCase("past")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateAfterStart(ownerId, date));
+                            .findAllByOwnerIdAndDateAfterStart(ownerId, date, pageable));
         } else if (state.equalsIgnoreCase("future")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBeforeStart(ownerId, date));
+                            .findAllByOwnerIdAndDateBeforeStart(ownerId, date, pageable));
         } else if (state.equalsIgnoreCase("waiting")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName()));
+                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName(), pageable));
         } else if (state.equalsIgnoreCase("rejected")) {
             return Converter
                     .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName()));
+                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName(), pageable));
         } else {
             throw new ValidationException(String.format("Unknown state: %s", state));
         }

@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.converterDto.Converter;
 import ru.practicum.shareit.booking.model.Booking;
@@ -112,8 +114,10 @@ public class ItemServiceImplRepos implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListOfItems(Long userId) {
-        List<ItemDto> itemDtoList = ItemDtoRowMapper.convertListOfItemsToListOfDtoItems(itemRepository.findItemsByOwnerId(userId));
+    public List<ItemDto> getListOfItems(Long userId, Long from, Long size) {
+        List<ItemDto> itemDtoList = ItemDtoRowMapper
+                .convertListOfItemsToListOfDtoItems(itemRepository
+                        .findItemsByOwnerId(PageRequest.of(from.intValue(), size.intValue()), userId));
 
         for (ItemDto itemDto : itemDtoList) {
             Booking lastBooking = bookingRepository
@@ -133,13 +137,13 @@ public class ItemServiceImplRepos implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListOfItemsBySearch(String text) {
+    public List<ItemDto> getListOfItemsBySearch(String text, Long from, Long size) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
         return ItemDtoRowMapper
                 .convertListOfItemsToListOfDtoItems(itemRepository
-                        .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(text, text));
+                        .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(PageRequest.of(from.intValue(), size.intValue()),text, text));
     }
 
     @Override

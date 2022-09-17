@@ -32,12 +32,12 @@ public class ItemServiceImplDao implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getListOfItems(Long userId) {
+    public List<ItemDto> getListOfItems(Long userId, Long from, Long size) {
         return itemDao.getListOfItems(userId);
     }
 
     @Override
-    public List<ItemDto> getListOfItemsBySearch(String text) {
+    public List<ItemDto> getListOfItemsBySearch(String text, Long from, Long size) {
         return itemDao.getListOfItemsBySearch(text);
     }
 
