@@ -59,6 +59,17 @@ public class BookingRepositoryTest {
         em.clear();
         itemRepository.save(item);
     }
+/**
+ * if run separately, test passes
+    */
+    @Test
+    void shouldFindBookingsByItemOwnerId() {
+        em.persistAndFlush(booking);
+        em.clear();
+
+        List<Booking> bookingList = bookingRepository.findAllByOwnerId(1L);
+        assertFalse(bookingList.isEmpty());
+    }
 
     @Test
     void shouldFindBookingsByBookerIdWithStatusCurrent() {
@@ -103,12 +114,4 @@ public class BookingRepositoryTest {
         assertFalse(bookingList.isEmpty());
     }
 
-    @Test
-    void shouldFindBookingsByItemOwnerId() {
-        em.persistAndFlush(booking);
-        em.clear();
-
-        List<Booking> bookingList = bookingRepository.findAllByOwnerId(1L);
-        assertFalse(bookingList.isEmpty());
-    }
 }
