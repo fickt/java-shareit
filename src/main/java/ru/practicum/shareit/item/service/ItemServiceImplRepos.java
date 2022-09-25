@@ -57,10 +57,10 @@ public class ItemServiceImplRepos implements ItemService {
 
             itemDto.setOwnerId(userId);
             Item item = itemRepository.save(ItemDtoRowMapper.convertDtoToItem(itemDto));
-        if(itemDto.getRequestId() != null) {
+        if (itemDto.getRequestId() != null) {
             itemRepository.saveToRequestAndItemIdTable(item.getRequestId(), item.getId());
         }
-            return ItemDtoRowMapper.convertItemToDto(item);
+        return ItemDtoRowMapper.convertItemToDto(item);
     }
 
     @Override
@@ -150,14 +150,14 @@ public class ItemServiceImplRepos implements ItemService {
             return Collections.emptyList();
         }
 
-        if(from == null || size == null) {
+        if (from == null || size == null) {
             return ItemDtoRowMapper
                     .convertListOfItemsToListOfDtoItems(itemRepository
                             .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(text, text));
         }
         return ItemDtoRowMapper
                 .convertListOfItemsToListOfDtoItems(itemRepository
-                        .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(PageRequest.of(from.intValue(), size.intValue()),text, text));
+                        .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(PageRequest.of(from.intValue(), size.intValue()), text, text));
     }
 
     @Override

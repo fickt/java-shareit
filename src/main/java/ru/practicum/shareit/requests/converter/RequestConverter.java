@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 public class RequestConverter {
 
     public static ItemRequestDto convertRequestToDto(ItemRequest itemRequest) {
-       return ItemRequestDto.builder()
+        return ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
                 .requestorId(itemRequest.getRequestorId())
                 .created(itemRequest.getCreated())
-               .items(itemRequest.getItems())
+                .items(itemRequest.getItems())
                 .build();
     }
 
@@ -27,7 +27,7 @@ public class RequestConverter {
 
     }
 
-    public static List<ItemRequestDto> convertRequestListToDto (List<ItemRequest> requestList) {
+    public static List<ItemRequestDto> convertRequestListToDto(List<ItemRequest> requestList) {
         return requestList.stream()
                 .map(RequestConverter::convertRequestToDto)
                 .collect(Collectors.toList());

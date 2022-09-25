@@ -50,16 +50,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getRangeOfRequests(Long from, Long size, Long userId) {
-        if(from == null || size == null) {
-            return RequestConverter.
-                    convertRequestListToDto(requestRepository
+        if (from == null || size == null) {
+            return RequestConverter
+                    .convertRequestListToDto(requestRepository
                             .findAllByIdNotNull())
                     .stream()
                     .filter(o -> !o.getItems().isEmpty() && !o.getRequestorId().equals(userId))
                     .collect(Collectors.toList());
         }
-        return RequestConverter.
-                convertRequestListToDto(requestRepository
+        return RequestConverter
+                .convertRequestListToDto(requestRepository
                         .findAllByIdNotNull(PageRequest.of(from.intValue(), size.intValue(), Sort.by("created").descending())))
                 .stream()
                 .filter(o -> !o.getItems().isEmpty() && !o.getRequestorId().equals(userId))

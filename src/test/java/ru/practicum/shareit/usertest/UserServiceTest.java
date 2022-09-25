@@ -91,8 +91,7 @@ public class UserServiceTest {
                 .thenReturn(Optional.ofNullable(UserDtoRowMapper.convertDtoToUser(userDto)));
 
         given(userRepository.save(any()))
-                .willAnswer(invocation ->
-                        {
+                .willAnswer(invocation -> {
                             throw new JDBCException(null, null);
                         }
                 );
@@ -109,8 +108,7 @@ public class UserServiceTest {
     @Test
     void shouldThrowNotFoundException() {
         given(userRepository.save(any()))
-                .willAnswer(invocation ->
-                        {
+                .willAnswer(invocation -> {
                             throw new NotFoundException(String.format("User with ID: %s has not been found!", 1L));
                         }
                 );
@@ -121,7 +119,6 @@ public class UserServiceTest {
                 String.format("User with ID: %s has not been found!", 1L
                 ));
 
-        assertEquals(thrown.getMessage(),String.format("User with ID: %s has not been found!", 1L));
-
+        assertEquals(thrown.getMessage(), String.format("User with ID: %s has not been found!", 1L));
     }
 }

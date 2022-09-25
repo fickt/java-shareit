@@ -83,7 +83,7 @@ public class ItemControllerTest {
 
     @Test
     void shouldEditAndReturnItem() throws Exception {
-        when(itemService.editItem(anyLong(), anyLong() , Mockito.any()))
+        when(itemService.editItem(anyLong(), anyLong(), Mockito.any()))
                 .thenReturn(itemDto);
         mockMvc.perform(patch("/items/1")
                         .header("X-Sharer-User-Id", 1L)

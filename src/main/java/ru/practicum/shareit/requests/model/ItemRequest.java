@@ -25,6 +25,7 @@ public class ItemRequest {
         this.requestorId = requestorId;
         this.created = created;
     }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
