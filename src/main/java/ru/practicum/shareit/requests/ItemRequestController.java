@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.ItemRequestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -20,8 +21,9 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ItemRequestDto createItemRequest(ItemRequestDto requestDto) {
-        return itemRequestService.createItemRequest(requestDto);
+    public ItemRequestDto createItemRequest(@RequestHeader("X-Sharer-User-Id") Long requestorId,
+                                            @RequestBody @Valid ItemRequestDto requestDto) {
+        return itemRequestService.createItemRequest(requestDto, requestorId);
     }
 
 
@@ -30,19 +32,21 @@ public class ItemRequestController {
         return itemRequestService.getAllRequests(requestorId);
     }
 
-/**
- * To get range of requests of all users,
- * where {from} = initial index, {size} = last index
- */
+    /**
+     * To get range of requests of all users;
+     * {from} = initial index, {size} = last index;
+     */
     @GetMapping("/all")
-    public List<ItemRequestDto> getRangeOfRequests(@RequestParam(value = "from", required = false) Long from,
+    public List<ItemRequestDto> getRangeOfRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                   @RequestParam(value = "from", required = false) Long from,
                                                    @RequestParam(value = "size", required = false) Long size) {
-        return itemRequestService.getRangeOfRequests(from, size);
+        return itemRequestService.getRangeOfRequests(from, size, userId);
     }
 
     @GetMapping("{requestId}")
-    public ItemRequestDto getItemRequestById(@PathVariable Long requestId) {
-        return itemRequestService.getItemRequestById(requestId);
+    public ItemRequestDto getItemRequestById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                             @PathVariable Long requestId) {
+        return itemRequestService.getItemRequestById(requestId, userId);
     }
 }
 

@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.rowmapper.UserDtoRowMapper;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository("UserServiceRepos")
 public class UserServiceImplRepos implements UserService {
@@ -35,12 +34,10 @@ public class UserServiceImplRepos implements UserService {
 
     @Override
     public UserDto getUser(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return UserDtoRowMapper.convertUserToDto(user.get());
-        } else {
-            throw new NotFoundException(String.format("User with ID: %s has not been found!", userId));
-        }
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID: %s has not been found!", userId)));
+            return UserDtoRowMapper.convertUserToDto(user);
     }
 
     @Override
@@ -50,18 +47,16 @@ public class UserServiceImplRepos implements UserService {
 
     @Override
     public UserDto editUser(Long userId, UserDto userDto) {
-        User user;
-        if (userRepository.findById(userId).isPresent()) {
-            user = userRepository.findById(userId).get();
-            if (userDto.getName() != null) {
-                user.setName(userDto.getName());
-            }
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID: %s has not been found!", userId)));
 
-            if (userDto.getEmail() != null) {
-                user.setEmail(userDto.getEmail());
-            }
-        } else {
-            throw new NotFoundException(String.format("User with ID: %s has not been found!", userId));
+        if (userDto.getName() != null) {
+            user.setName(userDto.getName());
+        }
+
+        if (userDto.getEmail() != null) {
+            user.setEmail(userDto.getEmail());
         }
 
         try {

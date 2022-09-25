@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface ItemRequestService {
 
-    ItemRequestDto createItemRequest(ItemRequestDto requestDto);
+    ItemRequestDto createItemRequest(ItemRequestDto requestDto, Long userId);
 
     List<ItemRequestDto> getAllRequests(Long requestorId);
 
-    List<ItemRequestDto> getRangeOfRequests(Long from, Long size);
+    List<ItemRequestDto> getRangeOfRequests(Long from, Long size, Long userId);
 
-    ItemRequestDto getItemRequestById(Long requestId);
+    ItemRequestDto getItemRequestById(Long requestId, Long userId);
 }

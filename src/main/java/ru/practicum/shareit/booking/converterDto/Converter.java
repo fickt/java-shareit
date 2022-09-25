@@ -19,6 +19,8 @@ public class Converter {
                .end(bookingDto.getEnd())
                .itemId(bookingDto.getBookerId())
                .status(bookingDto.getStatus())
+               .item(bookingDto.getItem())
+               .booker(bookingDto.getBooker())
                .bookerId(bookingDto.getItemId())
                .build();
     }

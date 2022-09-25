@@ -45,6 +45,7 @@ public class Item {
     @JsonProperty("available")
     @Column(name = "IS_AVAILABLE")
     private Boolean isAvailable;
+    @Column(name = "REQUEST_ID")
     private Long requestId;
     @OneToMany(mappedBy = "item")
     @JsonManagedReference

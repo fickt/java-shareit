@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.converterDto.Converter;
 import ru.practicum.shareit.booking.model.Booking;
@@ -23,7 +22,6 @@ import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.validation.Valid;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -52,20 +50,24 @@ public class ItemServiceImplRepos implements ItemService {
     }
 
     @Override
-    public ItemDto addItem(Long userId, @Valid ItemDto itemDto) {
-        if (userRepository.existsById(userId)) {
+    public ItemDto addItem(Long userId, ItemDto itemDto) {
+        userRepository
+                .findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID: %s has not been found!", userId)));
+
             itemDto.setOwnerId(userId);
             Item item = itemRepository.save(ItemDtoRowMapper.convertDtoToItem(itemDto));
-            return ItemDtoRowMapper.convertItemToDto(item);
-        } else {
-            throw new NotFoundException(String.format("User with ID: %s has not been found!", userId));
+        if(itemDto.getRequestId() != null) {
+            itemRepository.saveToRequestAndItemIdTable(item.getRequestId(), item.getId());
         }
+            return ItemDtoRowMapper.convertItemToDto(item);
     }
 
     @Override
     public ItemDto getItem(Long itemId, Long userId) {
         log.info(String.format("Trying to find item with ID: %s ...", itemId));
-        Item item = itemRepository.findFirstById(itemId)
+        Item item = itemRepository
+                .findFirstById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID: %s has not been found!", itemId)));
 
         log.info(MessageFormat.format("getItem found: {0}", item.getName()));
@@ -115,10 +117,16 @@ public class ItemServiceImplRepos implements ItemService {
 
     @Override
     public List<ItemDto> getListOfItems(Long userId, Long from, Long size) {
-        List<ItemDto> itemDtoList = ItemDtoRowMapper
-                .convertListOfItemsToListOfDtoItems(itemRepository
-                        .findItemsByOwnerId(PageRequest.of(from.intValue(), size.intValue()), userId));
-
+        List<ItemDto> itemDtoList;
+        if (from == null || size == null) {
+            itemDtoList = ItemDtoRowMapper
+                    .convertListOfItemsToListOfDtoItems(itemRepository
+                            .findItemsByOwnerId(userId));
+        } else {
+            itemDtoList = ItemDtoRowMapper
+                    .convertListOfItemsToListOfDtoItems(itemRepository
+                            .findItemsByOwnerId(PageRequest.of(from.intValue(), size.intValue()), userId));
+        }
         for (ItemDto itemDto : itemDtoList) {
             Booking lastBooking = bookingRepository
                     .findFirstByItemIdAndStartBefore(itemDto.getId(), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -140,6 +148,12 @@ public class ItemServiceImplRepos implements ItemService {
     public List<ItemDto> getListOfItemsBySearch(String text, Long from, Long size) {
         if (text.isBlank()) {
             return Collections.emptyList();
+        }
+
+        if(from == null || size == null) {
+            return ItemDtoRowMapper
+                    .convertListOfItemsToListOfDtoItems(itemRepository
+                            .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(text, text));
         }
         return ItemDtoRowMapper
                 .convertListOfItemsToListOfDtoItems(itemRepository

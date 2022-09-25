@@ -44,6 +44,7 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .description(item.getDescription())
                 .isAvailable(item.getIsAvailable())
                 .comments(item.getComments())
+                .requestId(item.getRequestId())
                 .build();
     }
 
@@ -55,6 +56,7 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .ownerId(item.getOwnerId())
                 .description(item.getDescription())
                 .isAvailable(item.getIsAvailable())
+                .requestId(item.getRequestId())
                 .build();
     }
 

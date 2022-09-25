@@ -10,9 +10,11 @@ public class RequestConverter {
 
     public static ItemRequestDto convertRequestToDto(ItemRequest itemRequest) {
        return ItemRequestDto.builder()
+                .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
                 .requestorId(itemRequest.getRequestorId())
                 .created(itemRequest.getCreated())
+               .items(itemRequest.getItems())
                 .build();
     }
 

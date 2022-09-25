@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.booking.status.Status;
 import ru.practicum.shareit.item.model.Item;
@@ -44,10 +46,14 @@ public class Booking {
     private Long itemId;
     @Column(name = "USER_ID")
     private Long bookerId;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @NotFound(
+            action = NotFoundAction.IGNORE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_ID", insertable = false, updatable = false)
     private User booker;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @NotFound(
+            action = NotFoundAction.IGNORE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)
     private Item item;
     @Column(name = "STATUS")
