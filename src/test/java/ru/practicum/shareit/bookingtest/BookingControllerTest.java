@@ -3,6 +3,7 @@ package ru.practicum.shareit.bookingtest;
 import com.google.gson.Gson;
 
 
+import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingServiceImplRepos;
 import ru.practicum.shareit.booking.status.Status;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.handler.ExceptionHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -37,6 +41,13 @@ public class BookingControllerTest {
     BookingServiceImplRepos bookingService;
 
     BookingDto bookingDto;
+
+    @Before
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup()
+                .setControllerAdvice(new ExceptionHandler())
+                .build();
+    }
 
     @BeforeEach
     void createItemAndBookingAndUser() {
@@ -127,5 +138,19 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.[0].id").value(bookingDto.getId()))
                 .andExpect(jsonPath("$.[0].itemId").value(bookingDto.getItemId()))
                 .andExpect(jsonPath("$.[0].status").value("WAITING"));
+    }
+
+    @Test
+    void shouldThrowValidationExceptionBecauseNonExistentStatus() throws Exception {
+        when(bookingService.getAllBookingsOfUser(anyLong(), any(), any(), any()))
+                .thenThrow(new ValidationException("Unknown state: unsupported"));
+
+        mockMvc.perform(get("/bookings?state=unsupported")
+                        .header("X-Sharer-User-Id", 1L)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Unknown state: unsupported"));
     }
 }

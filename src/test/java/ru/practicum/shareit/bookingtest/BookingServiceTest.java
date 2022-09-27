@@ -10,9 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImplRepos;
 import ru.practicum.shareit.booking.status.Status;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.NotOwnerException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.rowmapper.ItemDtoRowMapper;
@@ -515,4 +513,18 @@ public class BookingServiceTest {
 
         assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", 1L, 2L));
     }
+
+    /*@Test
+    void shouldThrowValidationExceptionBecauseNonExistentStatus() {
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(UserDtoRowMapper.convertDtoToUser(userDto)));
+
+        ValidationException thrown = assertThrows(
+                ValidationException.class,
+                () -> bookingService.getAllBookingsOfUser(1L, "status_all", null, null),
+                "Error: Unknown state: status_all"
+                );
+
+        assertEquals("Error: Unknown state: status_all", thrown.getMessage());
+    }*/
 }
