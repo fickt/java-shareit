@@ -102,7 +102,7 @@ public class UserServiceTest {
                 String.format("User with email: %s already exists!", userDto.getEmail()
                 ));
 
-        assertEquals(thrown.getMessage(), String.format("User with email: %s already exists!", userDto.getEmail()));
+        assertEquals(String.format("User with email: %s already exists!", userDto.getEmail()), thrown.getMessage());
     }
 
     @Test
@@ -119,6 +119,6 @@ public class UserServiceTest {
                 String.format("User with ID: %s has not been found!", 1L
                 ));
 
-        assertEquals(thrown.getMessage(), String.format("User with ID: %s has not been found!", 1L));
+        assertEquals(String.format("User with ID: %s has not been found!", 1L), thrown.getMessage());
     }
 }

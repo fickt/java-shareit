@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Slf4j
@@ -117,15 +118,24 @@ public class BookingServiceImplRepos implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsOfUser(Long userId, String state, Long from, Long size) {
+    public List<BookingDto> getAllBookingsOfUser(Long userId, String status, Long from, Long size) {
         userRepository
                 .findById(userId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", userId))));
 
-        LocalDateTime date = LocalDateTime.now();
+        if (status.equals(null)) {
+            status = "all";
+        }
+
+        if (from == null || size == null) {
+            return getBookingsOfUserNoPagination(userId, status);
+        }
+        return getBookingsOfUserWithPagination(userId, status, from, size);
+
+        /*LocalDateTime date = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("all")) {
             if (from == null || size == null) {
-                return Converter
+                return Converter//
                         .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
             }
             return Converter
@@ -183,15 +193,24 @@ public class BookingServiceImplRepos implements BookingService {
                                     PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
         } else {
             throw new ValidationException(String.format("Unknown state: %s", state));
-        }
+        }*/
     }
 
     @Override
-    public List<BookingDto> getAllBookingsOfItemsOfOwner(Long ownerId, String state, Long from, Long size) {
+    public List<BookingDto> getAllBookingsOfItemsOfOwner(Long ownerId, String status, Long from, Long size) {
         userRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", ownerId))));
-        LocalDateTime date = LocalDateTime.now();
+
+        if (status.equals(null)) {
+            status = "all";
+        }
+        if (from == null || size == null) {
+            return getAllBookingsOfItemsOfOwnerNoPagination(ownerId, status);
+        }
+        return getAllBookingsOfItemsOfOwnerWithPagination(ownerId, status, from, size);
+
+        /*LocalDateTime date = LocalDateTime.now();
         if (state == null || state.equalsIgnoreCase("all")) {
             if (from == null || size == null) {
                 return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId));
@@ -250,6 +269,164 @@ public class BookingServiceImplRepos implements BookingService {
                                     PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
         } else {
             throw new ValidationException(String.format("Unknown state: %s", state));
+        }*/
+    }
+
+    private List<BookingDto> getBookingsOfUserNoPagination(Long userId, String status) {
+        LocalDateTime date = LocalDateTime.now();
+
+        switch (status.toLowerCase()) {
+            case "all":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
+
+            case "current":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date));
+
+            case "past":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateAfterEnd(userId, date));
+
+            case "future":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateBeforeStart(userId, date));
+
+            case "waiting":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING));
+
+            case "rejected":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED));
+
+            default: throw new ValidationException(String.format("Unknown state: %s", status));
+        }
+    }
+
+    private List<BookingDto> getBookingsOfUserWithPagination(Long userId, String status, Long from, Long size) {
+        LocalDateTime date = LocalDateTime.now();
+
+        switch (status.toLowerCase()) {
+            case "all":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId,
+                                PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "current":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "past":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateAfterEnd(userId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "future":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndDateBeforeStart(userId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "waiting":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "rejected":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            default: throw new ValidationException(String.format("Unknown state: %s", status));
+        }
+    }
+
+    private List<BookingDto> getAllBookingsOfItemsOfOwnerNoPagination(Long ownerId, String status) {
+        LocalDateTime date = LocalDateTime.now();
+
+        switch (status.toLowerCase()) {
+            case "all":
+                return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId));
+
+            case "current":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date));
+
+            case "past":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateAfterStart(ownerId, date));
+
+            case "future":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateBeforeStart(ownerId, date));
+
+            case "waiting":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName()));
+
+            case "rejected":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName()));
+
+            default: throw new ValidationException(String.format("Unknown state: %s", status));
+        }
+    }
+
+    private List<BookingDto> getAllBookingsOfItemsOfOwnerWithPagination(Long ownerId, String status, Long from, Long size) {
+        LocalDateTime date = LocalDateTime.now();
+
+        switch (status.toLowerCase()) {
+            case "all":
+                return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId,
+                        PageRequest.of(from.intValue() - 1, size.intValue())));
+
+            case "current":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "past":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateAfterStart(ownerId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "future":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndDateBeforeStart(ownerId, date,
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "waiting":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName(),
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            case "rejected":
+                return Converter
+                        .convertListOfBookingToDto(bookingRepository
+                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName(),
+                                        PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
+
+            default: throw new ValidationException(String.format("Unknown state: %s", status));
         }
     }
 }

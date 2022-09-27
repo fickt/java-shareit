@@ -1,5 +1,6 @@
 package ru.practicum.shareit.requests.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.item.model.Item;
@@ -33,6 +34,7 @@ public class ItemRequest {
     private String description;
     @Column(name = "REQUESTOR_ID")
     private Long requestorId;
+    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "CREATED_AT")
     private LocalDateTime created;
     @OneToMany(cascade = { CascadeType.ALL })

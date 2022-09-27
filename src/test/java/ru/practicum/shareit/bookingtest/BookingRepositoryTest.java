@@ -1,5 +1,7 @@
 package ru.practicum.shareit.bookingtest;
 
+import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +47,8 @@ public class BookingRepositoryTest {
                 .build();
     }
 
-    @BeforeEach
-    void createItem() {
+    @Test
+    void shouldFindBookingsByItemOwnerId() {
         item = Item.builder()
                 .id(1L)
                 .ownerId(1L)
@@ -58,12 +60,7 @@ public class BookingRepositoryTest {
         em.merge(item);
         em.clear();
         itemRepository.save(item);
-    }
-/**
- * if run separately, test passes
-    */
-    @Test
-    void shouldFindBookingsByItemOwnerId() {
+
         em.persistAndFlush(booking);
         em.clear();
 

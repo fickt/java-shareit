@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.comment.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -39,7 +40,7 @@ public class Comment {
     @Column(name = "AUTHOR_NAME")
     private String authorName;
     @Column(name = "CREATED")
-    @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime created;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)

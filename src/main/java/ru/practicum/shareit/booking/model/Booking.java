@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.NotFound;
@@ -36,10 +37,10 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "START_DATE")
     private LocalDateTime start;
-    @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     @Column(name = "END_DATE")
     private LocalDateTime end;
     @Column(name = "ITEM_ID")

@@ -49,7 +49,6 @@ public class BookingServiceTest {
 
     BookingDto booking;
 
-
     @BeforeEach
     void createItem() {
         itemDto = ItemDto.builder()
@@ -141,7 +140,7 @@ public class BookingServiceTest {
                 "Invalid period of time"
         );
 
-        assertEquals(thrown.getMessage(), "Invalid period of time");
+        assertEquals("Invalid period of time", thrown.getMessage());
     }
 
     @Test
@@ -161,7 +160,7 @@ public class BookingServiceTest {
                 "You are owner of this item!"
         );
 
-        assertEquals(thrown.getMessage(), "You are owner of this item!");
+        assertEquals("You are owner of this item!", thrown.getMessage());
     }
 
     @Test
@@ -170,7 +169,7 @@ public class BookingServiceTest {
         booking.setBooker(UserDtoRowMapper.convertDtoToUser(userDto));
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(Converter.convertDtoToBooking(booking)));
-        assertEquals(bookingService.getBooking(1L, 1L), booking);
+        assertEquals(booking, bookingService.getBooking(1L, 1L));
     }
 
     @Test
@@ -193,7 +192,7 @@ public class BookingServiceTest {
                 .thenReturn(Converter.convertDtoToBooking(booking));
 
         BookingDto bookingDto = bookingService.changeStatusBooking(1L, 1L, Boolean.TRUE);
-        assertEquals(bookingDto.getStatus().getName(), "approved");
+        assertEquals("approved", bookingDto.getStatus().getName());
     }
 
     @Test
@@ -216,7 +215,7 @@ public class BookingServiceTest {
                 .thenReturn(Converter.convertDtoToBooking(booking));
 
         BookingDto bookingDto = bookingService.changeStatusBooking(1L, 1L, Boolean.FALSE);
-        assertEquals(bookingDto.getStatus().getName(), "rejected");
+        assertEquals("rejected", bookingDto.getStatus().getName());
     }
 
     @Test
@@ -234,7 +233,7 @@ public class BookingServiceTest {
                 () -> bookingService.changeStatusBooking(2L, 1L, Boolean.TRUE),
                 "You are not an owner of this item!"
         );
-        assertEquals(thrown.getMessage(), "You are not an owner of this item!");
+        assertEquals("You are not an owner of this item!", thrown.getMessage());
     }
 
     @Test
@@ -245,7 +244,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdOrderByStartDesc(anyLong()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "all", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "all", null, null));
     }
 
     @Test
@@ -256,7 +255,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdOrderByStartDesc(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "all", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "all", 1L, 2L));
     }
 
     @Test
@@ -267,7 +266,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdAndDateBetweenStartAndEnd(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "current", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "current", null, null));
     }
 
     @Test
@@ -278,7 +277,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdAndDateBetweenStartAndEnd(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "current", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "current", 1L, 2L));
     }
 
     @Test
@@ -289,7 +288,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdAndDateAfterEnd(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "past", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "past", null, null));
     }
 
     @Test
@@ -300,7 +299,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdAndDateAfterEnd(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "past", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "past", 1L, 2L));
     }
 
     @Test
@@ -312,7 +311,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndDateBeforeStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "future", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "future", null, null));
     }
 
     @Test
@@ -324,7 +323,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndDateBeforeStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "future", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "future", 1L, 2L));
     }
 
     @Test
@@ -336,7 +335,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndStatusEqualsOrderByStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "waiting", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "waiting", null, null));
     }
 
     @Test
@@ -348,7 +347,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndStatusEqualsOrderByStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "waiting", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "waiting", 1L, 2L));
     }
 
     @Test
@@ -360,7 +359,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndStatusEqualsOrderByStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "rejected", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "rejected", null, null));
     }
 
     @Test
@@ -372,7 +371,7 @@ public class BookingServiceTest {
                 .findAllByBookerIdAndStatusEqualsOrderByStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfUser(1L, "rejected", 1L, 1L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfUser(1L, "rejected", 1L, 1L));
     }
 
     @Test
@@ -383,7 +382,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByOwnerId(anyLong()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "all", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "all", null, null));
     }
 
     @Test
@@ -394,7 +393,7 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByOwnerId(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "all", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "all", 1L, 2L));
     }
 
     @Test
@@ -406,7 +405,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateBetweenStartAndEnd(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "current", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "current", null, null));
     }
 
     @Test
@@ -418,7 +417,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateBetweenStartAndEnd(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "current", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "current", 1L, 2L));
     }
 
     @Test
@@ -430,7 +429,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateAfterStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "past", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "past", null, null));
     }
 
     @Test
@@ -442,7 +441,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateAfterStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "past", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "past", 1L, 2L));
     }
 
     @Test
@@ -454,7 +453,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateBeforeStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "future", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "future", null, null));
     }
 
     @Test
@@ -466,7 +465,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndDateBeforeStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "future", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "future", 1L, 2L));
     }
 
     @Test
@@ -478,7 +477,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndStatusEqualsOrderByStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "waiting", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "waiting", null, null));
     }
 
     @Test
@@ -490,7 +489,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndStatusEqualsOrderByStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "waiting", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "waiting", 1L, 2L));
     }
 
     @Test
@@ -502,7 +501,7 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndStatusEqualsOrderByStart(anyLong(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", null, null), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", null, null));
     }
 
     @Test
@@ -514,7 +513,6 @@ public class BookingServiceTest {
                 .findAllByOwnerIdAndStatusEqualsOrderByStart(anyLong(), any(), any()))
                 .thenReturn(List.of(Converter.convertDtoToBooking(booking)));
 
-        assertEquals(bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", 1L, 2L), List.of(booking));
+        assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", 1L, 2L));
     }
-
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.comment.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,6 @@ public class CommentDto {
     private Long itemId;
     private Long authorId;
     private String authorName;
-    @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime created;
 }
