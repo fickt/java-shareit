@@ -8,12 +8,11 @@ import ru.practicum.shareit.booking.status.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class BookingDto implements Serializable {
+public class BookingDto {
     private Long id;
     @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime start;
