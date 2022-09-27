@@ -20,7 +20,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @Slf4j
@@ -131,69 +130,6 @@ public class BookingServiceImplRepos implements BookingService {
             return getBookingsOfUserNoPagination(userId, status);
         }
         return getBookingsOfUserWithPagination(userId, status, from, size);
-
-        /*LocalDateTime date = LocalDateTime.now();
-        if (state == null || state.equalsIgnoreCase("all")) {
-            if (from == null || size == null) {
-                return Converter//
-                        .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository.findAllByBookerIdOrderByStartDesc(userId,
-                            PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("current")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateBetweenStartAndEnd(userId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("past")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByBookerIdAndDateAfterEnd(userId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateAfterEnd(userId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("future")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByBookerIdAndDateBeforeStart(userId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndDateBeforeStart(userId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("waiting")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.WAITING,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("rejected")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByBookerIdAndStatusEqualsOrderByStart(userId, Status.REJECTED,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else {
-            throw new ValidationException(String.format("Unknown state: %s", state));
-        }*/
     }
 
     @Override
@@ -209,67 +145,6 @@ public class BookingServiceImplRepos implements BookingService {
             return getAllBookingsOfItemsOfOwnerNoPagination(ownerId, status);
         }
         return getAllBookingsOfItemsOfOwnerWithPagination(ownerId, status, from, size);
-
-        /*LocalDateTime date = LocalDateTime.now();
-        if (state == null || state.equalsIgnoreCase("all")) {
-            if (from == null || size == null) {
-                return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId));
-            }
-            return Converter.convertListOfBookingToDto(bookingRepository.findAllByOwnerId(ownerId,
-                    PageRequest.of(from.intValue() - 1, size.intValue())));
-        } else if (state.equalsIgnoreCase("current")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBetweenStartAndEnd(ownerId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("past")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByOwnerIdAndDateAfterStart(ownerId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateAfterStart(ownerId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("future")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByOwnerIdAndDateBeforeStart(ownerId, date));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndDateBeforeStart(ownerId, date,
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("waiting")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName()));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.WAITING.getName(),
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else if (state.equalsIgnoreCase("rejected")) {
-            if (from == null || size == null) {
-                return Converter
-                        .convertListOfBookingToDto(bookingRepository
-                                .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName()));
-            }
-            return Converter
-                    .convertListOfBookingToDto(bookingRepository
-                            .findAllByOwnerIdAndStatusEqualsOrderByStart(ownerId, Status.REJECTED.getName(),
-                                    PageRequest.of(from.intValue() - 1, size.intValue(), Sort.by("start").descending())));
-        } else {
-            throw new ValidationException(String.format("Unknown state: %s", state));
-        }*/
     }
 
     private List<BookingDto> getBookingsOfUserNoPagination(Long userId, String status) {

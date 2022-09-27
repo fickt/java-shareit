@@ -4,7 +4,6 @@ package ru.practicum.shareit.requests.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.validation.constraints.NotBlank;
