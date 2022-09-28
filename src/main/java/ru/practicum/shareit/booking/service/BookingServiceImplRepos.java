@@ -141,7 +141,7 @@ public class BookingServiceImplRepos implements BookingService {
         if (status == null) {
             status = "all";
         }
-        
+
         if (from == null || size == null) {
             return getAllBookingsOfItemsOfOwnerNoPagination(ownerId, status);
         }
