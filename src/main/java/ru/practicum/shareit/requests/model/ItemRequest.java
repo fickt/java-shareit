@@ -1,8 +1,8 @@
 package ru.practicum.shareit.requests.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
@@ -34,7 +34,7 @@ public class ItemRequest {
     private String description;
     @Column(name = "REQUESTOR_ID")
     private Long requestorId;
-    @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
+    @DateTimeFormat(pattern = "uuuu-MM-dd HH:mm:ss")
     @Column(name = "CREATED_AT")
     private LocalDateTime created;
     @OneToMany(cascade = { CascadeType.ALL })

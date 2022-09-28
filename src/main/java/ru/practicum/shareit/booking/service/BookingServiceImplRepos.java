@@ -122,7 +122,7 @@ public class BookingServiceImplRepos implements BookingService {
                 .findById(userId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", userId))));
 
-        if (status.equals(null)) {
+        if (status == null) {
             status = "all";
         }
 
@@ -138,9 +138,10 @@ public class BookingServiceImplRepos implements BookingService {
                 .findById(ownerId)
                 .orElseThrow(() -> new NotFoundException((String.format("User with ID: %s has not been found!", ownerId))));
 
-        if (status.equals(null)) {
+        if (status == null) {
             status = "all";
         }
+        
         if (from == null || size == null) {
             return getAllBookingsOfItemsOfOwnerNoPagination(ownerId, status);
         }
