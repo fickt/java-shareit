@@ -52,6 +52,22 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionCreatingUserWithEmailAlreadyExists() {
+        given(userRepository.save(any()))
+                .willAnswer(invocation -> {
+                            throw new JDBCException(null, null);
+                        }
+                );
+        InvalidDataConflictException thrown = assertThrows(
+                InvalidDataConflictException.class,
+                () -> userService.createUser(userDto),
+                String.format("User with email: %s already exists!", userDto.getEmail()
+                ));
+
+        assertEquals(String.format("User with email: %s already exists!", userDto.getEmail()), thrown.getMessage());
+    }
+
+    @Test
     void shouldGetUser() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(UserDtoRowMapper.convertDtoToUser(userDto)));
