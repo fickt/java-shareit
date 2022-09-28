@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.practicum.shareit.exception.InvalidDataConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -21,6 +20,7 @@ public class ItemDaoTest {
     ItemDao itemDao;
 
     Item item;
+
     @BeforeEach
     void createItem() {
         item = Item.builder()
