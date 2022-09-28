@@ -24,7 +24,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class UserServiceTest {
+public class UserServiceImplReposTest {
 
     @Autowired
     UserServiceImplRepos userService;
