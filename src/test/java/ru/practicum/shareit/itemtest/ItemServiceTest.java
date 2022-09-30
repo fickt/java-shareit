@@ -61,6 +61,7 @@ public class ItemServiceTest {
                 .description("Just an item")
                 .isAvailable(Boolean.TRUE)
                 .requestId(1L)
+                .comments(Collections.emptyList())
                 .build();
     }
 
