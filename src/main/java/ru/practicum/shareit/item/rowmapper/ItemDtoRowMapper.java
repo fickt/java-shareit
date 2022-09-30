@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.rowmapper;
 
-import org.hibernate.mapping.Collection;
 import org.springframework.jdbc.core.RowMapper;
 import ru.practicum.shareit.item.comment.converter.CommentDtoConverter;
 import ru.practicum.shareit.item.dto.ItemDto;
