@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.comment.model.Comment;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,7 +23,7 @@ public class ItemDto {
     @NotNull(message = "please set availability")
     @JsonProperty("available")
     private Boolean isAvailable;
-    private List<Comment> comments;
+    private List<CommentDto> comments; //TODO UNCOMMITED CHANGES
     private BookingDto lastBooking;
     private BookingDto nextBooking;
     private Long requestId;

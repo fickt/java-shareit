@@ -1,11 +1,14 @@
 package ru.practicum.shareit.item.rowmapper;
 
+import org.hibernate.mapping.Collection;
 import org.springframework.jdbc.core.RowMapper;
+import ru.practicum.shareit.item.comment.converter.CommentDtoConverter;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,19 +17,17 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
 
     @Override
     public ItemDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-        ItemDto itemDto = ItemDto.builder()
+        return ItemDto.builder()
                 .id(rs.getLong("ID"))
                 .name(rs.getString("NAME"))
                 .description(rs.getString("DESCRIPTION"))
                 .isAvailable(rs.getBoolean("IS_AVAILABLE"))
                 .ownerId(rs.getLong("OWNER_ID"))
                 .build();
-        return itemDto;
     }
 
     public static ItemDto mapRow(Map<String, Object> map) {
-        return ItemDto
-                .builder()
+        return ItemDto.builder()
                 .id((Long) map.get("ID"))
                 .name((String) map.get("NAME"))
                 .description((String) map.get("DESCRIPTION"))
@@ -43,7 +44,10 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .ownerId(item.getOwnerId())
                 .description(item.getDescription())
                 .isAvailable(item.getIsAvailable())
-                .comments(item.getComments())
+                .comments(item.getComments() != null ?
+                        item.getComments().stream()
+                                .map(CommentDtoConverter::convertCommentToDto)
+                                .collect(Collectors.toList()) : Collections.emptyList()) //TODO UNCOMMITED CHANGES
                 .requestId(item.getRequestId())
                 .build();
     }
