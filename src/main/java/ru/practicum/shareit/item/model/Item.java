@@ -50,5 +50,4 @@ public class Item {
     @OneToMany(mappedBy = "item")
     @JsonManagedReference
     private List<Comment> comments = new ArrayList<>();
-
 }
