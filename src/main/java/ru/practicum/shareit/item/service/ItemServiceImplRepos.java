@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("ItemServiceRepos")
@@ -70,26 +71,36 @@ public class ItemServiceImplRepos implements ItemService {
                 .findFirstById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID: %s has not been found!", itemId)));
 
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID: %s has not been found!", userId)));
         log.info(MessageFormat.format("getItem found: {0}", item.getName()));
 
         ItemDto itemDto = ItemDtoRowMapper.convertItemToDto(item);
 
+        if (commentRepository.existsByItemIdAndAuthorId(itemId, userId)) {
+            return attachCommentsToItem(itemDto);
+        }
+
         if (!userId.equals(itemDto.getOwnerId())) {
+            itemDto.setComments(Collections.emptyList());
             return itemDto;
         }
+
         Booking lastBooking = bookingRepository
                 .findFirstByItemIdAndStartBefore(itemDto.getId(), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         if (lastBooking != null) {
             log.info(String.format("Last booking for item ID: %s has been found!", itemId));
+            attachCommentsToItem(ItemDtoRowMapper.convertItemToDto(lastBooking.getItem()));
             itemDto.setLastBooking(Converter.convertBookingToDto(lastBooking));
         }
         Booking nextBooking = bookingRepository.findFirstByItemIdAndStartAfter(itemDto.getId(), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         if (nextBooking != null) {
             log.info(String.format("Next booking for item ID: %s has been found!", itemId));
+            attachCommentsToItem(ItemDtoRowMapper.convertItemToDto(nextBooking.getItem()));
             itemDto.setNextBooking(Converter.convertBookingToDto(nextBooking));
         }
         log.info(String.format("Sending successfully out itemDTO ID: %s", itemId));
-        return itemDto;
+        return attachCommentsToItem(itemDto);
     }
 
     @Override
@@ -112,7 +123,8 @@ public class ItemServiceImplRepos implements ItemService {
         if (itemDto.getIsAvailable() != null) {
             item.setIsAvailable(itemDto.getIsAvailable());
         }
-        return ItemDtoRowMapper.convertItemToDto(itemRepository.save(item));
+        ItemDto persistedItemDto = ItemDtoRowMapper.convertItemToDto(itemRepository.save(item));
+        return attachCommentsToItem(persistedItemDto);
     }
 
     @Override
@@ -141,7 +153,7 @@ public class ItemServiceImplRepos implements ItemService {
             }
         }
 
-        return itemDtoList;
+        return attachCommentsToListOfItems(itemDtoList);
     }
 
     @Override
@@ -150,14 +162,19 @@ public class ItemServiceImplRepos implements ItemService {
             return Collections.emptyList();
         }
 
+        List<ItemDto> itemDtoList;
+
         if (from == null || size == null) {
-            return ItemDtoRowMapper
+            itemDtoList = ItemDtoRowMapper
                     .convertListOfItemsToListOfDtoItems(itemRepository
                             .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(text, text));
+        } else {
+            itemDtoList = ItemDtoRowMapper
+                    .convertListOfItemsToListOfDtoItems(itemRepository
+                            .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(PageRequest.of(from.intValue(), size.intValue()), text, text));
         }
-        return ItemDtoRowMapper
-                .convertListOfItemsToListOfDtoItems(itemRepository
-                        .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(PageRequest.of(from.intValue(), size.intValue()), text, text));
+
+        return attachCommentsToListOfItems(itemDtoList);
     }
 
     @Override
@@ -178,5 +195,37 @@ public class ItemServiceImplRepos implements ItemService {
         CommentDto persistedComment = CommentDtoConverter.convertCommentToDto(commentRepository.save(comment));
         commentRepository.saveItemIdAndCommentIdToItemCommentTable(persistedComment.getItemId(), persistedComment.getId());
         return persistedComment;
+    }
+
+    /**
+     * Before sending ItemDto/List<ItemDto> as a response
+     * it is needed to attach comments via these methods
+     */
+    private List<ItemDto> attachCommentsToListOfItems(List<ItemDto> itemDtoList) {
+        for (ItemDto itemDto : itemDtoList) {
+            List<CommentDto> commentDtoList = commentRepository
+                    .findAllByItemId(itemDto.getId()).stream()
+                    .map(CommentDtoConverter::convertCommentToDto)
+                    .collect(Collectors.toList());
+            if (commentDtoList.isEmpty()) {
+                itemDto.setComments(Collections.emptyList());
+            } else {
+                itemDto.setComments(commentDtoList);
+            }
+        }
+        return itemDtoList;
+    }
+
+    private ItemDto attachCommentsToItem(ItemDto itemDto) {
+        List<CommentDto> commentDtoList = commentRepository
+                .findAllByItemId(itemDto.getId()).stream()
+                .map(CommentDtoConverter::convertCommentToDto)
+                .collect(Collectors.toList());
+        if (commentDtoList.isEmpty()) {
+            itemDto.setComments(Collections.emptyList());
+        } else {
+            itemDto.setComments(commentDtoList);
+        }
+        return itemDto;
     }
 }

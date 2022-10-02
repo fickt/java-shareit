@@ -43,10 +43,6 @@ public class ItemDtoRowMapper implements RowMapper<ItemDto> {
                 .ownerId(item.getOwnerId())
                 .description(item.getDescription())
                 .isAvailable(item.getIsAvailable())
-                .comments(item.getComments() != null ?
-                        item.getComments().stream()
-                                .map(CommentDtoConverter::convertCommentToDto)
-                                .collect(Collectors.toList()) : Collections.emptyList())
                 .requestId(item.getRequestId())
                 .build();
     }
