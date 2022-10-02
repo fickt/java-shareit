@@ -79,7 +79,6 @@ public class ItemServiceTest {
     void createBooking() {
         booking = BookingDto.builder()
                 .status(Status.WAITING)
-                .item(ItemDtoRowMapper.convertDtoToItem(itemDto))
                 .build();
     }
 
