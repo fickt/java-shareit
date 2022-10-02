@@ -116,7 +116,7 @@ public class BookingServiceTest {
                 String.format("Item with ID: %s is unavailable for booking", booking.getItemId()
                 ));
 
-        assertEquals(thrown.getMessage(), String.format("Item with ID: %s is unavailable for booking", booking.getItemId()));
+        assertEquals(String.format("Item with ID: %s is unavailable for booking", booking.getItemId()), thrown.getMessage());
     }
 
     @Test
@@ -514,7 +514,7 @@ public class BookingServiceTest {
         assertEquals(List.of(booking), bookingService.getAllBookingsOfItemsOfOwner(1L, "rejected", 1L, 2L));
     }
 
-    /*@Test
+    @Test
     void shouldThrowValidationExceptionBecauseNonExistentStatus() {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(UserDtoRowMapper.convertDtoToUser(userDto)));
@@ -522,9 +522,9 @@ public class BookingServiceTest {
         ValidationException thrown = assertThrows(
                 ValidationException.class,
                 () -> bookingService.getAllBookingsOfUser(1L, "status_all", null, null),
-                "Error: Unknown state: status_all"
+                "Unknown state: status_all"
                 );
 
-        assertEquals("Error: Unknown state: status_all", thrown.getMessage());
-    }*/
+        assertEquals("Unknown state: status_all", thrown.getMessage());
+    }
 }

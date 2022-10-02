@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item.comment.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,12 +18,12 @@ public class Comment {
 
     }
 
-    public Comment(Long id, String text, Long itemId, Long authorId, String authorName, LocalDateTime created) {
+    public Comment(Long id, String text, Long itemId, Long authorId, String authorName, LocalDateTime created, Item item) {
         this.id = id;
         this.text = text;
         this.itemId = itemId;
         this.authorId = authorId;
-      //  this.item = item;
+        this.item = item;
         this.authorName = authorName;
         this.created = created;
     }
@@ -39,8 +41,8 @@ public class Comment {
     @Column(name = "CREATED")
     @JsonFormat(pattern = "uuuu-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime created;
-  //  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  //  @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)
-   // @JsonBackReference
-   // private Item item;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ITEM_ID", insertable = false, updatable = false)
+    @JsonBackReference
+    private Item item;
 }

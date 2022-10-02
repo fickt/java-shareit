@@ -23,7 +23,7 @@ public class ItemDto {
     @NotNull(message = "please set availability")
     @JsonProperty("available")
     private Boolean isAvailable;
-    private List<CommentDto> comments; //TODO UNCOMMITED CHANGES
+    private List<CommentDto> comments;
     private BookingDto lastBooking;
     private BookingDto nextBooking;
     private Long requestId;

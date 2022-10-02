@@ -130,8 +130,7 @@ public class ItemServiceTest {
         when(itemRepository.save(any()))
                 .thenReturn(ItemDtoRowMapper.convertDtoToItem(itemDto));
 
-        //itemDto
-        assertEquals(itemService.editItem(1L, 1L, itemDto), itemService.editItem(1L, 1L, itemDto)); //TODO костыль
+        assertEquals(itemDto, itemService.editItem(1L, 1L, itemDto));
     }
 
     @Test
@@ -153,36 +152,34 @@ public class ItemServiceTest {
 
         assertEquals(itemService.getListOfItems(1L, null, null), itemService.getListOfItems(1L, null, null));
 
-//TODO 2 костыля List.of(itemDto)
-        assertEquals(itemService.getListOfItems(1L, 1L, 2L), itemService.getListOfItems(1L, 1L, 2L));
+        assertEquals(List.of(itemDto), itemService.getListOfItems(1L, 1L, 2L));
 
-       // verify(bookingRepository, times(2)).findFirstByItemIdAndStartBefore(anyLong(), any());
-       // verify(bookingRepository, times(2)).findFirstByItemIdAndStartAfter(anyLong(), any());
+        verify(bookingRepository, times(3)).findFirstByItemIdAndStartBefore(anyLong(), any());
+        verify(bookingRepository, times(3)).findFirstByItemIdAndStartAfter(anyLong(), any());
+
     }
 
     @Test
     void shouldReturnEmptyListOfItemsBySearch() {
-        assertEquals(itemService.getListOfItemsBySearch(" ", null, null), Collections.emptyList());
+        assertEquals(Collections.emptyList(), itemService.getListOfItemsBySearch(" ", null, null));
     }
 
     @Test
     void shouldReturnListOfItemsBySearchWithTextButFromAndSizeEqualNull() {
         when(itemRepository.findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(anyString(), anyString()))
                 .thenReturn(List.of(ItemDtoRowMapper.convertDtoToItem(itemDto)));
-        assertEquals(itemService.getListOfItemsBySearch("item", null, null), itemService.getListOfItemsBySearch("item", null, null));
-//todo костыль
-        //  verify(itemRepository, times(1))
-         //       .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(anyString(), anyString());
+        assertEquals(List.of(itemDto), itemService.getListOfItemsBySearch("item", null, null));
+          verify(itemRepository, times(1))
+                .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(anyString(), anyString());
     }
 
     @Test
     void shouldReturnListOfItemsBySearchWithTextAndFromAndSizeEqualOne() {
         when(itemRepository.findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(any(), anyString(), anyString()))
                 .thenReturn(List.of(ItemDtoRowMapper.convertDtoToItem(itemDto)));
-        assertEquals(itemService.getListOfItemsBySearch("item", 1L, 1L), itemService.getListOfItemsBySearch("item", 1L, 1L));
-//TODO костыль
-        // verify(itemRepository, times(1))
-         //       .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(any(), anyString(), anyString());
+        assertEquals(List.of(itemDto), itemService.getListOfItemsBySearch("item", 1L, 1L));
+         verify(itemRepository, times(1))
+                .findItemsByNameOrDescriptionContainingIgnoreCaseAndIsAvailableTrue(any(), anyString(), anyString());
     }
 
     @Test

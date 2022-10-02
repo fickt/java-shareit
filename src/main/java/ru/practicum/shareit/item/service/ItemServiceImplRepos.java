@@ -175,6 +175,8 @@ public class ItemServiceImplRepos implements ItemService {
         commentDto.setCreated(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         commentDto.setAuthorName(user.getName());
         Comment comment = CommentDtoConverter.convertDtoToComment(commentDto);
-        return CommentDtoConverter.convertCommentToDto(commentRepository.save(comment));
+        CommentDto persistedComment = CommentDtoConverter.convertCommentToDto(commentRepository.save(comment));
+        commentRepository.saveItemIdAndCommentIdToItemCommentTable(persistedComment.getItemId(), persistedComment.getId());
+        return persistedComment;
     }
 }
