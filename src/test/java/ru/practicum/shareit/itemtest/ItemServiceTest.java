@@ -2,6 +2,7 @@ package ru.practicum.shareit.itemtest;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -107,7 +108,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     void shouldGetItem() {
         when(itemRepository.findFirstById(anyLong()))
                 .thenReturn(Optional.ofNullable(ItemDtoRowMapper.convertDtoToItem(itemDto)));
