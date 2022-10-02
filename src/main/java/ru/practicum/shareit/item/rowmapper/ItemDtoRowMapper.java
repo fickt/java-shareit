@@ -1,13 +1,11 @@
 package ru.practicum.shareit.item.rowmapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.practicum.shareit.item.comment.converter.CommentDtoConverter;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
