@@ -1,14 +1,15 @@
 version: '3.8'
 services:
   gateway:
-    build: /gateway
+    build: ./gateway
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
     ports:
       - "8080:8080"
 
+
   server:
-    build: /server
+    build: ./server
     container_name: server
     ports:
     - "9090:9090"
