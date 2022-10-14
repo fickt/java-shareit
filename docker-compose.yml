@@ -4,7 +4,6 @@ services:
     build: ./gateway
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
-      - TZ=Europe/Moscow
     ports:
       - "8080:8080"
 
@@ -14,8 +13,6 @@ services:
     container_name: server
     depends_on:
      - gateway
-    environment:
-      - TZ=Europe/Moscow
     ports:
     - "9090:9090"
 
