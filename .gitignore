@@ -31,5 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-src/main/resources/schema.trace.db
-src/main/resources/schema.mv.db
