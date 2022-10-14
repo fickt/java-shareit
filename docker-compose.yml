@@ -12,8 +12,11 @@ services:
   server:
     build: ./server
     container_name: server
+    depends_on:
+     - gateway
     environment:
       - TZ=Europe/Moscow
     ports:
     - "9090:9090"
+
 
